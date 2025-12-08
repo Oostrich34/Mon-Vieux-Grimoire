@@ -47,6 +47,7 @@ function BookForm({ book, validate }) {
     // When we create a new book
     if (!book) {
       if (!data.file[0]) {
+        // eslint-disable-next-line
         alert('Vous devez ajouter une image');
       }
       if (!data.rating) {
@@ -58,6 +59,7 @@ function BookForm({ book, validate }) {
       if (!newBook.error) {
         validate(true);
       } else {
+        // eslint-disable-next-line
         alert(newBook.message);
       }
     } else {
@@ -65,6 +67,7 @@ function BookForm({ book, validate }) {
       if (!updatedBook.error) {
         navigate('/');
       } else {
+        // eslint-disable-next-line
         alert(updatedBook.message);
       }
     }
