@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 
+require('dotenv').config();
+
 const bookRoutes = require('./routes/book');
 const userRoutes = require('./routes/user');
-
-require('dotenv').config();
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connexion à MongoDB réussie !')) // eslint-disable-line no-console

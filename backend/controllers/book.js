@@ -2,6 +2,7 @@ const fs = require('fs');
 const Book = require('../models/Book');
 
 exports.createBook = (req, res) => {
+  // Si nous arrivons ici, req.auth.userId est défini.
   const bookObject = JSON.parse(req.body.book);
   delete bookObject._id;
   /* eslint-disable-next-line no-underscore-dangle */
@@ -62,7 +63,10 @@ exports.deleteBook = (req, res) => {
 exports.getOneBook = (req, res) => {
   Book.findOne({ _id: req.params.id })
     .then((book) => res.status(200).json(book))
-    .catch((error) => res.status(404).json({ error }));
+    .catch((error) => {
+      console.log('BREAKING: ', error);
+      res.status(404).json({ error });
+    });
 };
 
 exports.getAllBooks = (req, res) => {

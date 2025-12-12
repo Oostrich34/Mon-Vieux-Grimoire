@@ -9,16 +9,17 @@ module.exports = (req, res, next) => {
     }
 
     const token = authorization.split(' ')[1]; // "Bearer <token>"
-    const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+    const decodedToken = jwt.verify(token, process.env.RANDOM_TOKEN_SECRET);
+
     const { userId } = decodedToken;
 
-    if (req.body.userId && req.body.userId !== userId) {
-      return res.status(401).json({ error: 'User ID non valable' });
-    }
+    // 💡 Définition de la variable dans la requête (req.userId)
+    // Cela correspond à la lecture dans votre contrôleur: userId: req.userId,
+    req.auth = { userId };
 
-    req.userId = userId;
-    return next(); // <-- return ajouté pour satisfaire ESLint
+    return next();
   } catch (error) {
+    // Utiliser le message de l'erreur JWT s'il existe, sinon un message générique
     return res.status(401).json({ error: error.message || 'Requête non authentifiée' });
   }
 };

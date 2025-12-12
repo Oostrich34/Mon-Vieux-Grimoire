@@ -18,6 +18,7 @@ exports.signup = (req, res) => {
       res.status(201).json({ message: 'Utilisateur créé !' });
     })
     .catch((error) => {
+      console.log('BREAKING: ', error);
       res.status(500).json({ error });
     });
 };
@@ -35,12 +36,11 @@ exports.login = (req, res) => {
           res.status(401).json({ message: 'Mot de passe incorrect !' });
           return null;
         }
-
         res.status(200).json({
           userId: user._id,
           token: jwt.sign(
             { userId: user._id },
-            'RANDOM_TOKEN_SECRET',
+            process.env.RANDOM_TOKEN_SECRET,
             { expiresIn: '24h' },
           ),
         });
