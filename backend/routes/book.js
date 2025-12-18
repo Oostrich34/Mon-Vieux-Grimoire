@@ -15,10 +15,11 @@ const bookCtrl = require('../controllers/book');
 
 // Routes pour les livres
 router.get('/', bookCtrl.getAllBooks);
-router.post('/', auth, upload, processImage, bookCtrl.createBook);
+router.get('/bestrating', bookCtrl.getBestRating);
 router.get('/:id', bookCtrl.getOneBook);
+router.post('/', auth, upload, processImage, bookCtrl.createBook);
+router.post('/:id/rating', auth, bookCtrl.rateBook);
 router.put('/:id', auth, upload, processImage, bookCtrl.modifyBook);
 router.delete('/:id', auth, bookCtrl.deleteBook);
-router.post('/:id/rating', auth, bookCtrl.rateBook);
 
 module.exports = router;
