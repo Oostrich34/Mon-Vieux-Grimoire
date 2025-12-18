@@ -127,3 +127,13 @@ exports.rateBook = (req, res) => {
     .then((updatedBook) => res.status(200).json(updatedBook))
     .catch((error) => res.status(500).json({ error }));
 };
+
+// Récupération des 3 livres les mieux notés
+exports.getBestRating = (req, res) => {
+  // On trie par note moyenne descendante (-1), puis on limite à 3
+  Book.find()
+    .sort({ averageRating: -1 })
+    .limit(3)
+    .then((books) => res.status(200).json(books))
+    .catch((error) => res.status(400).json({ error }));
+};
