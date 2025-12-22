@@ -9,9 +9,6 @@ const storage = multer.memoryStorage();
 // Définition de l'uploader
 const upload = multer({
   storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // Limite de 5MB pour l'image
-  },
   fileFilter: (req, file, callback) => {
     // Accepter uniquement les fichiers images
     if (!file.mimetype.startsWith('image/')) {
@@ -27,8 +24,9 @@ const imagesDir = path.join(__dirname, '..', 'images');
 // S'assurer que le dossier 'images' existe
 (async () => {
   try {
-    await fs.mkdir(imagesDir, { recursive: true });
+    await fs.mkdir(imagesDir, { recursive: true }); // Crée le dossier s'il n'existe pas
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Erreur lors de la création du dossier 'images':", error);
   }
 })();
