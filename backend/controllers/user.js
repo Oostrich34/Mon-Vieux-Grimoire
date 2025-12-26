@@ -19,8 +19,12 @@ exports.signup = (req, res) => {
     .then(() => {
       res.status(201).json({ message: 'Utilisateur créé !' });
     })
+    // Gérer les erreurs, notamment l'email déjà utilisé
     .catch((error) => {
-      res.status(500).json({ error });
+      const message = error.message === 'Cet email est déjà utilisé.'
+        ? error.message
+        : 'Erreur lors de l\'inscription';
+      res.status(400).json({ error: message });
     });
 };
 
