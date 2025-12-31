@@ -7,24 +7,29 @@ exports.createBook = (req, res) => {
   // Récupérer les données du livre
   const bookObject = JSON.parse(req.body.book);
 
-  // Supprimer les champs non autorisés
-  delete bookObject._id; // Supprimer l'ID généré par le client
+  // Validation des champs
+  if (!bookObject.title || !bookObject.author || !bookObject.year || !bookObject.genre) {
+    return res.status(400).json({
+      message: 'Tous les champs doivent être remplis !',
+    });
+  }
 
+  delete bookObject._id;
   /* eslint-disable-next-line no-underscore-dangle */
-  delete bookObject._userId; // Supprimer l'userId pour éviter les manipulations
+  delete bookObject._userId;
 
-  // Créer le nouvel objet Book avec les données reçues
   const book = new Book({
     ...bookObject,
-    userId: req.auth.userId, // Associer l'userId du créateur
-    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`, // Construire l'URL de l'image
-    ratings: bookObject.ratings || [], // Initialiser les notations si présentes
-    averageRating: bookObject.averageRating || 0, // Initialiser la note moyenne
+    userId: req.auth.userId,
+    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+    ratings: bookObject.ratings || [],
+    averageRating: bookObject.averageRating || 0,
   });
-  // Enregistrer le livre dans la base de données
-  book.save()
-    .then(() => { res.status(201).json({ message: 'Objet enregistré !' }); })
-    .catch((error) => { res.status(400).json({ error }); });
+
+  // On ajoute "return" devant book.save() et devant les réponses res.status()
+  return book.save()
+    .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
+    .catch((error) => res.status(400).json({ error }));
 };
 
 // Modification d'un livre existant
