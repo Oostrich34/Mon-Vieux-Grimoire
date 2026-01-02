@@ -9,6 +9,13 @@ exports.createBook = (req, res) => {
 
   // Validation des champs
   if (!bookObject.title || !bookObject.author || !bookObject.year || !bookObject.genre) {
+    // Supprimer le fichier image téléchargé en cas d'erreur de validation
+    if (req.file) {
+      fs.unlink(`images/${req.file.filename}`, (err) => {
+        if (err) console.log('Erreur lors de la suppression du fichier :', err);
+      });
+    }
+
     return res.status(400).json({
       message: 'Tous les champs doivent être remplis !',
     });
