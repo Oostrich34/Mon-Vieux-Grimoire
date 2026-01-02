@@ -92,17 +92,13 @@ exports.deleteBook = (req, res) => {
       // Vérification de l'utilisateur
       if (book.userId !== req.auth.userId) {
         res.status(401).json({ message: 'Non-autorisé' });
-      } else {
-        // Supprimer l'image associée au livre
-        const filename = book.imageUrl.split('/images/')[1];
-        // Supprimer le fichier image du système de fichiers
-        fs.unlink(`images/${filename}`, () => {
-          // Supprimer le livre de la base de données
-          Book.deleteOne({ _id: req.params.id })
-            .then(() => res.status(200).json({ message: 'Objet supprimé !' }))
-            .catch((error) => res.status(401).json({ error }));
-        });
       }
+      // Supprimer le fichier image associé
+      deleteImageFile(book.imageUrl);
+      // Supprimer le livre de la base de données
+      Book.deleteOne({ _id: req.params.id })
+        .then(() => res.status(200).json({ message: 'Objet supprimé !' }))
+        .catch((error) => res.status(401).json({ error }));
     })
     .catch((error) => {
       res.status(500).json({ error });
