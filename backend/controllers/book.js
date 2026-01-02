@@ -1,6 +1,20 @@
 const fs = require('fs');
 const Book = require('../models/Book');
 
+/**
+ * Fonction utilitaire pour supprimer une image du serveur
+ * @param {string} filename - Nom du fichier ou URL complète
+ */
+const deleteImageFile = (filename) => {
+  if (!filename) return;
+  // Si c'est une URL, on extrait le nom du fichier
+  const fileToDelete = filename.includes('/images/') ? filename.split('/images/')[1] : filename;
+
+  fs.unlink(`images/${fileToDelete}`, (err) => {
+    if (err) console.log('Erreur suppression fichier :', err); // eslint-disable-line no-console
+  });
+};
+
 // Création d'un nouveau livre
 exports.createBook = (req, res) => {
   // Si nous arrivons ici, req.auth.userId est défini.
@@ -10,15 +24,8 @@ exports.createBook = (req, res) => {
   // Validation des champs
   if (!bookObject.title || !bookObject.author || !bookObject.year || !bookObject.genre) {
     // Supprimer le fichier image téléchargé en cas d'erreur de validation
-    if (req.file) {
-      fs.unlink(`images/${req.file.filename}`, (err) => {
-        if (err) console.log('Erreur lors de la suppression du fichier :', err);
-      });
-    }
-
-    return res.status(400).json({
-      message: 'Tous les champs doivent être remplis !',
-    });
+    if (req.file) deleteImageFile(req.file.filename);
+    return res.status(400).json({ message: 'Tous les champs doivent être remplis !' });
   }
 
   delete bookObject._id;
@@ -36,7 +43,10 @@ exports.createBook = (req, res) => {
   // On ajoute "return" devant book.save() et devant les réponses res.status()
   return book.save()
     .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
-    .catch((error) => res.status(400).json({ error }));
+    .catch((error) => {
+      if (req.file) deleteImageFile(req.file.filename);
+      res.status(400).json({ error });
+    });
 };
 
 // Modification d'un livre existant
