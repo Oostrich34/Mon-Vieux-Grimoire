@@ -65,16 +65,22 @@ exports.modifyBook = (req, res) => {
     .then((book) => {
       // Vérification de l'utilisateur
       if (book.userId !== req.auth.userId) { // Comparer avec l'userId du token
+        if (req.file) deleteImageFile(req.file.filename);
         res.status(401).json({ message: 'Non-autorisé' });
-      } else {
-        // Mettre à jour le livre
-        // Assurer que l'ID reste le même
-        Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
-          .then(() => res.status(200).json({ message: 'Objet modifié !' }))
-          .catch((error) => res.status(401).json({ error }));
       }
+      // Supprimer l'ancienne image si une nouvelle est téléchargée
+      if (req.file) deleteImageFile(book.imageUrl);
+      // Mettre à jour le livre
+      // Assurer que l'ID reste le même
+      return Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
+        .then(() => res.status(200).json({ message: 'Objet modifié !' }))
+        .catch((error) => {
+          if (req.file) deleteImageFile(req.file.filename);
+          return res.status(401).json({ error });
+        });
     })
     .catch((error) => {
+      if (req.file) deleteImageFile(req.file.filename);
       res.status(400).json({ error });
     });
 };
